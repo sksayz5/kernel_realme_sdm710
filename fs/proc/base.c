@@ -96,6 +96,11 @@
 #include "fd.h"
 
 #include "../../lib/kstrtox.h"
+
+#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
+#include <linux/susfs.h>
+#endif
+
 #if defined(OPLUS_FEATURE_VIRTUAL_RESERVE_MEMORY) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 #include "va_feature_node.h"
 #endif
@@ -1850,6 +1855,11 @@ static int do_proc_readlink(struct path *path, char __user *buffer, int buflen)
 
 	if (len > buflen)
 		len = buflen;
+
+#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
+	susfs_suspicious_proc_fd_link(pathname, len);
+#endif
+
 	if (copy_to_user(buffer, pathname, len))
 		len = -EFAULT;
  out:
